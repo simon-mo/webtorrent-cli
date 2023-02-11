@@ -65,7 +65,8 @@ const options = {
     quit: { hidden: true, default: true },
     'on-done': { desc: 'Run script after torrent download is done', type: 'string', requiresArg: true },
     'on-exit': { desc: 'Run script before program exit', type: 'string', requiresArg: true },
-    'max-web-conns': { desc: 'Control the concurrency parameter maxWebConns', type: 'number', requiresArg: true, default: 4}
+    'max-web-conns': { desc: 'Control the concurrency parameter maxWebConns', type: 'number', requiresArg: true, default: 4},
+    'transfer-log': { desc: 'Recording logs from transfer profile', type: 'string', requiresArg: true, default: './transfer.log' }
   }
 }
 
@@ -645,6 +646,8 @@ function runSeed (input) {
 }
 
 function drawTorrent (torrent) {
+  let logFile = fs.createWriteStream(argv['transfer-log'])
+
   if (!argv.quiet) {
     console.clear()
     drawInterval = setInterval(draw, 1000)
@@ -701,6 +704,8 @@ function drawTorrent (torrent) {
       }}/{bold ${prettierBytes(torrent.length)}} {green Uploaded:} {bold ${prettierBytes(torrent.uploaded)
       }}`)
 
+
+
     line(chalk`{green Running time:} {bold ${runtime
       }}  {green Time remaining:} {bold ${estimate
       }}  {green Peers:} {bold ${unchoked.length
@@ -716,6 +721,7 @@ function drawTorrent (torrent) {
 
     line('')
 
+    let perPeerData = []
     torrent.wires.every(wire => {
       let progress = '?'
 
@@ -747,6 +753,16 @@ function drawTorrent (torrent) {
         (prettierBytes(wire.uploadSpeed()) + '/s').padEnd(12)
       ]
 
+      let peerDataToLog = {
+        "peerAddress": wire.remoteAddress,
+        "peerDownloadedBytes": wire.downloaded,
+        "peerUploadedBytes": wire.uploaded,
+        "peerDownloadSpeed": wire.downloadSpeed(),
+        "peerUploadSpeed": wire.uploadSpeed(),
+        "peerNumRequests": wire.requests.length
+      }
+      perPeerData.push(peerDataToLog)
+
       if (argv.verbose) {
         str += chalk` {grey %s} {grey %s}`
 
@@ -769,8 +785,17 @@ function drawTorrent (torrent) {
       line(...[].concat(str, args))
 
       peerslisted += 1
-      return linesRemaining > 4
+      return true // linesRemaining > 4
     })
+
+    logFile.write(JSON.stringify({
+      "runtimeSeconds": runtimeSeconds,
+      "downloadBytesPerSec": speed,
+      "downloadedBytes": torrent.downloaded,
+      "totalBytes": torrent.length,
+      "uploaddedBytes": torrent.ouploaded,
+      "peerData": perPeerData
+    }))
 
     line(''.padEnd(60))
 
