@@ -64,7 +64,8 @@ const options = {
     'no-quit': { desc: 'Don\'t quit when player exits', type: 'boolean' },
     quit: { hidden: true, default: true },
     'on-done': { desc: 'Run script after torrent download is done', type: 'string', requiresArg: true },
-    'on-exit': { desc: 'Run script before program exit', type: 'string', requiresArg: true }
+    'on-exit': { desc: 'Run script before program exit', type: 'string', requiresArg: true },
+    'max-web-conns': { desc: 'Control the concurrency parameter maxWebConns', type: 'number', requiresArg: true, default: 4}
   }
 }
 
@@ -126,15 +127,15 @@ yargs
         stripIndent`
           Usage:
             webtorrent [command] <torrent-id> [options]
-    
+
           Examples:
             webtorrent download "magnet:..." --vlc
             webtorrent "magnet:..." --vlc --player-args="--video-on-top --repeat"
-    
+
           Default output location:
             * when streaming: Temp folder
             * when downloading: Current directory
-    
+
           Specify <torrent-id> as one of:
             * magnet uri
             * http url to .torrent file
@@ -210,6 +211,8 @@ function init (_argv) {
   if (argv.uploadLimit > 0) {
     argv.uploadLimit = argv.u = argv['upload-limit'] = argv.uploadLimit * 1024
   }
+
+  argv.maxWebConns = argv['max-web-conns']
 
   if (argv.onDone) {
     argv.onDone = argv['on-done'] = argv.onDone.split(' ')
@@ -294,7 +297,8 @@ async function runDownload (torrentId) {
 
   const torrent = client.add(torrentId, {
     path: argv.out,
-    announce: argv.announce
+    announce: argv.announce,
+    maxWebConns: argv.maxWebConns
   })
 
   if (argv.verbose) {
