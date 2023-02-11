@@ -795,7 +795,7 @@ function drawTorrent (torrent) {
       "totalBytes": torrent.length,
       "uploaddedBytes": torrent.ouploaded,
       "peerData": perPeerData
-    }))
+    })+"\n")
 
     line(''.padEnd(60))
 
