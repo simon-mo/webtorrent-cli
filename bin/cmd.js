@@ -66,7 +66,8 @@ const options = {
     'on-done': { desc: 'Run script after torrent download is done', type: 'string', requiresArg: true },
     'on-exit': { desc: 'Run script before program exit', type: 'string', requiresArg: true },
     'max-web-conns': { desc: 'Control the concurrency parameter maxWebConns', type: 'number', requiresArg: true, default: 4},
-    'transfer-log': { desc: 'Recording logs from transfer profile', type: 'string', requiresArg: true, default: './transfer.log' }
+    'transfer-log': { desc: 'Recording logs from transfer profile', type: 'string', requiresArg: true, default: './transfer.log' },
+    'strategy': { desc: 'Download strategy, options are sequential or rarest', type: 'string', requiresArg: true, default: 'rarest'}
   }
 }
 
@@ -299,7 +300,9 @@ async function runDownload (torrentId) {
   const torrent = client.add(torrentId, {
     path: argv.out,
     announce: argv.announce,
-    maxWebConns: argv.maxWebConns
+    private: false,
+    maxWebConns: argv.maxWebConns,
+    strategy: argv.strategy
   })
 
   if (argv.verbose) {
