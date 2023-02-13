@@ -67,7 +67,8 @@ const options = {
     'on-exit': { desc: 'Run script before program exit', type: 'string', requiresArg: true },
     'max-web-conns': { desc: 'Control the concurrency parameter maxWebConns', type: 'number', requiresArg: true, default: 4},
     'transfer-log': { desc: 'Recording logs from transfer profile', type: 'string', requiresArg: true, default: './transfer.log' },
-    'strategy': { desc: 'Download strategy, options are sequential or rarest', type: 'string', requiresArg: true, default: 'rarest'}
+    'strategy': { desc: 'Download strategy, options are sequential or rarest', type: 'string', requiresArg: true, default: 'sequential'},
+    'no-utp': { desc: 'Whether to enable utp', type: 'boolean'}
   }
 }
 
@@ -293,7 +294,8 @@ async function runDownload (torrentId) {
     torrentPort: argv['torrent-port'],
     dhtPort: argv['dht-port'],
     downloadLimit: argv.downloadLimit,
-    uploadLimit: argv.uploadLimit
+    uploadLimit: argv.uploadLimit,
+    utp: !argv['no-utp']
   })
   client.on('error', fatalError)
 
