@@ -104,14 +104,14 @@ let torrentCount = 1
 
 process.title = 'WebTorrent'
 
-process.on('exit', code => {
-  if (code === 0 || expectedError) return // normal exit
-  if (code === 130) return // intentional exit with Control-C
+// process.on('exit', code => {
+//   if (code === 0 || expectedError) return // normal exit
+//   if (code === 130) return // intentional exit with Control-C
 
-  console.log(chalk`\n{red UNEXPECTED ERROR:} If this is a bug in WebTorrent, report it!`)
-  console.log(chalk`{green OPEN AN ISSUE:} https://github.com/webtorrent/webtorrent-cli/issues\n`)
-  console.log(`DEBUG INFO: webtorrent-cli ${webTorrentCliVersion}, webtorrent ${webTorrentVersion}, node ${process.version}, ${process.platform} ${process.arch}, exit ${code}`)
-})
+//   console.log(chalk`\n{red UNEXPECTED ERROR:} If this is a bug in WebTorrent, report it!`)
+//   console.log(chalk`{green OPEN AN ISSUE:} https://github.com/webtorrent/webtorrent-cli/issues\n`)
+//   console.log(`DEBUG INFO: webtorrent-cli ${webTorrentCliVersion}, webtorrent ${webTorrentVersion}, node ${process.version}, ${process.platform} ${process.arch}, exit ${code}`)
+// })
 
 process.on('SIGINT', gracefulExit)
 process.on('SIGTERM', gracefulExit)
